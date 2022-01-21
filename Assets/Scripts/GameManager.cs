@@ -111,7 +111,7 @@ public class GameManager : MonoBehaviour
             center.text += $"<color=#{ColorUtility.ToHtmlStringRGB(roundWinner.teamTraits.color)}>{roundWinner.teamTraits.identifier}</color> wins the {(hasWinner ? "game" : "round")}!\n\n";
         
         foreach (Team team in teams)
-                center.text += $"<color=#{ColorUtility.ToHtmlStringRGB(team.teamTraits.color)}><size=32>{team.teamTraits.identifier}: {team.teamTraits.points} points</size></color>\n";
+                center.text += $"<color=#{ColorUtility.ToHtmlStringRGB(team.teamTraits.color)}><size=36>{team.teamTraits.identifier}: {team.teamTraits.points} points</size></color>\n";
     }
 
     private IEnumerator GameLoop()
