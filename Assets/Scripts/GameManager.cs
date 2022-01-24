@@ -15,14 +15,17 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI lastRoundWinner;
     public TextMeshProUGUI winningStreak;
     public GameSettings gameSettings;
+    public GameObject snitchTemplate;
 
     private GameObject[] wizards;
+    private SnitchController snitchController;
     private WaitForSeconds startWait;
     private WaitForSeconds endWait;
     private int roundNumber = 0;
     private Team roundWinner;
     private Team previousRoundWinner;
     private bool hasWinner = false;
+    private bool roundFinished = false;
     private int streak = 0;
 
     private void Start()
@@ -42,27 +45,45 @@ public class GameManager : MonoBehaviour
             team.Initialize();
     }
 
+    private void SpawnSnitch()
+    {
+        GameObject snitch = GameObject.Instantiate(snitchTemplate, this.gameObject.transform);
+        snitchController = snitch.GetComponent<SnitchController>();
+        snitchController.OnRoundEnd.AddListener(OnRoundEnd);
+    }
+
+    public void OnRoundEnd(Team team)
+    {
+        previousRoundWinner = roundWinner;
+        roundWinner = team;
+        roundFinished = true;
+    }
+
     private void InitializeWizards()
     {
-        wizards = GameObject.FindGameObjectsWithTag("Wizard");
-        foreach (GameObject wizard in wizards)
+        foreach (Team team in teams)
         {
-            Wizard wizardScript = wizard.GetComponent<Wizard>();
-            wizardScript.Initialize();
+            team.MoveWizards();
         }
     }
 
     private void DestroyWizards()
     {
-        wizards = GameObject.FindGameObjectsWithTag("Wizard");
-        foreach (GameObject wizard in wizards)
-            GameObject.Destroy(wizard);
+        foreach (Team team in teams)
+        {
+            team.DestroyWizards();
+        }
     }
 
     private void ResetScores()
     {
         foreach (Team team in teams)
             team.ResetScore();
+    }
+
+    private void ResetMatch()
+    {
+        roundFinished = false;
     }
 
     private void ResetTexts()
@@ -111,7 +132,7 @@ public class GameManager : MonoBehaviour
             center.text += $"<color=#{ColorUtility.ToHtmlStringRGB(roundWinner.teamTraits.color)}>{roundWinner.teamTraits.identifier}</color> wins the {(hasWinner ? "game" : "round")}!\n\n";
         
         foreach (Team team in teams)
-                center.text += $"<color=#{ColorUtility.ToHtmlStringRGB(team.teamTraits.color)}><size=36>{team.teamTraits.identifier}: {team.teamTraits.points} points</size></color>\n";
+            center.text += $"<color=#{ColorUtility.ToHtmlStringRGB(team.teamTraits.color)}><size=36>{team.teamTraits.identifier}: {team.teamTraits.points} points</size></color>\n";
     }
 
     private IEnumerator GameLoop()
@@ -134,9 +155,11 @@ public class GameManager : MonoBehaviour
     {
         roundNumber++;
 
+        ResetMatch();
         ResetTexts();
         DestroyWizards();
         SpawnWizards();
+        SpawnSnitch();
 
         RoundStartingText();
 
@@ -146,11 +169,12 @@ public class GameManager : MonoBehaviour
     private IEnumerator RoundPlaying()
     {
         RoundPlayingText();
+        InitializeWizards();
 
-        yield return startWait;
         // wait until someone collides with the snitch
-        // while (true)
+        // while (roundFinished != false)
         //     yield return null;
+        yield return startWait;
     }
 
     private IEnumerator RoundEnding()

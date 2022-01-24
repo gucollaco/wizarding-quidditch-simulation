@@ -5,7 +5,7 @@ using UnityEngine;
 public class Team : MonoBehaviour
 {
     public GameObject wizardTemplate;
-    public List<Wizard> wizards;
+    public List<GameObject> wizards;
     public Material material;
     public GameSettings gameSettings;
     public TeamTraits teamTraits;
@@ -26,7 +26,7 @@ public class Team : MonoBehaviour
     private void CreateWizard(int index)
     {
         if (wizards == null)
-            wizards = new List<Wizard>();
+            wizards = new List<GameObject>();
         
         GameObject wizard = GameObject.Instantiate(wizardTemplate, this.gameObject.transform);
         wizard.transform.parent = this.gameObject.transform;
@@ -34,5 +34,24 @@ public class Team : MonoBehaviour
         wizard.transform.localEulerAngles = new Vector3(0, teamTraits.initialYRotation, 0);
         wizardBody = wizard.transform.GetChild(0).gameObject.GetComponent<MeshRenderer>();
         wizardBody.material = material;
+        wizards.Add(wizard);
+    }
+
+    public void MoveWizards()
+    {
+        foreach (GameObject wizard in wizards)
+        {
+            wizard.GetComponent<Wizard>().Initialize();
+        }
+    }
+
+    public void DestroyWizards()
+    {
+        foreach (GameObject wizard in wizards)
+        {
+            GameObject.Destroy(wizard);
+        }
+
+        wizards = null;
     }
 }
