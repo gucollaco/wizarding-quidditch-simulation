@@ -13,6 +13,7 @@ public class SnitchController : MonoBehaviour
         {
             Team team = other.gameObject.GetComponentInParent<Team>();
             OnRoundEnd?.Invoke(team);
+
         }
     }
 }

@@ -17,6 +17,7 @@ public class GameManager : MonoBehaviour
     public GameSettings gameSettings;
     public GameObject snitchTemplate;
 
+    private GameObject snitch = null;
     private GameObject[] wizards;
     private SnitchController snitchController;
     private WaitForSeconds startWait;
@@ -47,13 +48,14 @@ public class GameManager : MonoBehaviour
 
     private void SpawnSnitch()
     {
-        GameObject snitch = GameObject.Instantiate(snitchTemplate, this.gameObject.transform);
+        snitch = GameObject.Instantiate(snitchTemplate);
         snitchController = snitch.GetComponent<SnitchController>();
         snitchController.OnRoundEnd.AddListener(OnRoundEnd);
     }
 
     public void OnRoundEnd(Team team)
     {
+        snitch.SetActive(false);
         previousRoundWinner = roundWinner;
         roundWinner = team;
         roundFinished = true;
@@ -73,6 +75,12 @@ public class GameManager : MonoBehaviour
         {
             team.DestroyWizards();
         }
+    }
+
+    private void DestroySnitch()
+    {
+        if (snitch != null)
+            GameObject.Destroy(snitch);
     }
 
     private void ResetScores()
@@ -158,6 +166,7 @@ public class GameManager : MonoBehaviour
         ResetMatch();
         ResetTexts();
         DestroyWizards();
+        DestroySnitch();
         SpawnWizards();
         SpawnSnitch();
 
@@ -166,15 +175,22 @@ public class GameManager : MonoBehaviour
         yield return startWait;
     }
 
+    private bool HasRoundFinished()
+    {
+        return roundFinished == true;
+    }
+
     private IEnumerator RoundPlaying()
     {
         RoundPlayingText();
         InitializeWizards();
 
         // wait until someone collides with the snitch
-        // while (roundFinished != false)
-        //     yield return null;
-        yield return startWait;
+        // while (roundFinished != "false")
+        while (!HasRoundFinished())
+        {
+            yield return null;
+        }
     }
 
     private IEnumerator RoundEnding()
