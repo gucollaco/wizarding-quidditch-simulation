@@ -69,6 +69,11 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    private void InitializeSnitch()
+    {
+        snitchController.Initialize();
+    }
+
     private void DestroyWizards()
     {
         foreach (Team team in teams)
@@ -167,8 +172,8 @@ public class GameManager : MonoBehaviour
         ResetTexts();
         DestroyWizards();
         DestroySnitch();
-        SpawnWizards();
         SpawnSnitch();
+        SpawnWizards();
 
         RoundStartingText();
 
@@ -183,10 +188,10 @@ public class GameManager : MonoBehaviour
     private IEnumerator RoundPlaying()
     {
         RoundPlayingText();
+        InitializeSnitch();
         InitializeWizards();
 
         // wait until someone collides with the snitch
-        // while (roundFinished != "false")
         while (!HasRoundFinished())
         {
             yield return null;

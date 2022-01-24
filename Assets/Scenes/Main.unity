@@ -1329,6 +1329,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 4103183874516175729, guid: 5a3418e06e58ab4c68d615f796d417f7, type: 3}
+      propertyPath: m_TagString
+      value: BoxSurface
+      objectReference: {fileID: 0}
     - target: {fileID: 4103183874733163436, guid: 5a3418e06e58ab4c68d615f796d417f7, type: 3}
       propertyPath: m_RootOrder
       value: 2
@@ -1376,6 +1380,26 @@ PrefabInstance:
     - target: {fileID: 4103183874733163437, guid: 5a3418e06e58ab4c68d615f796d417f7, type: 3}
       propertyPath: m_Name
       value: Box
+      objectReference: {fileID: 0}
+    - target: {fileID: 4103183874911879988, guid: 5a3418e06e58ab4c68d615f796d417f7, type: 3}
+      propertyPath: m_TagString
+      value: BoxSurface
+      objectReference: {fileID: 0}
+    - target: {fileID: 4103183875034803543, guid: 5a3418e06e58ab4c68d615f796d417f7, type: 3}
+      propertyPath: m_TagString
+      value: BoxSurface
+      objectReference: {fileID: 0}
+    - target: {fileID: 4103183875797481187, guid: 5a3418e06e58ab4c68d615f796d417f7, type: 3}
+      propertyPath: m_TagString
+      value: BoxSurface
+      objectReference: {fileID: 0}
+    - target: {fileID: 4103183876010605322, guid: 5a3418e06e58ab4c68d615f796d417f7, type: 3}
+      propertyPath: m_TagString
+      value: BoxSurface
+      objectReference: {fileID: 0}
+    - target: {fileID: 4103183876025828329, guid: 5a3418e06e58ab4c68d615f796d417f7, type: 3}
+      propertyPath: m_TagString
+      value: BoxSurface
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5a3418e06e58ab4c68d615f796d417f7, type: 3}
