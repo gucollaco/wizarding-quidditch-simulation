@@ -39,7 +39,6 @@ public class Wizard : MonoBehaviour
     public void Initialize()
     {
         rigid.mass = weight;
-        rigid.AddForce(Vector3.forward);
         hasInitialized = true;
     }
 
@@ -95,21 +94,13 @@ public class Wizard : MonoBehaviour
         }
     }
 
-    private void OnTriggerEnter(Collider other)
+    private void OnCollisionEnter(Collision other)
     {
         if (other.gameObject.CompareTag("BoxSurface"))
         {
-            // checks if the surface is the ground
-            if (other.gameObject.ToString().Contains("Bottom"))
-            {
-                rigid.AddForce(-rigid.velocity);
-            }
-            else
-            {
-                rigid.AddForce(-rigid.velocity);
-            }
+            rigid.AddForce(-rigid.velocity);
         }
-        else if (other.gameObject.CompareTag("WizardPart"))
+        else if (other.gameObject.CompareTag("Wizard"))
         {
             Team collidedTeam = other.gameObject.GetComponentInParent<Team>();
 
@@ -138,7 +129,7 @@ public class Wizard : MonoBehaviour
     private void DifferentTeamCollision(GameObject objectOne, GameObject objectTwo)
     {
         Wizard wizardOne = objectOne.GetComponent<Wizard>();
-        Wizard wizardTwo = objectTwo.GetComponentInParent<Wizard>();
+        Wizard wizardTwo = objectTwo.GetComponent<Wizard>();
 
         // both wizards should be conscious
         if (!wizardOne.unconscious && !wizardTwo.unconscious)
@@ -187,16 +178,16 @@ public class Wizard : MonoBehaviour
         // add force towards the snitch
         Vector3 snitchDifference = snitchPosition - thisPosition;
         acceleration += snitchDifference.normalized;
-        acceleration += NormalizeSteeringForce(snitchDifference) * 3;
+        acceleration += NormalizeSteeringForce(snitchDifference) * 2;
 
-        acceleration += NormalizeSteeringForce(ComputeSeperationForce());// * Flock.FlockSettings.SeperationForceWeight;
+        acceleration += NormalizeSteeringForce(ComputeSeperationForce()) * 2;
         acceleration += NormalizeSteeringForce(CollisionAvoidanceForce());
 
         float temporaryMaxVelocity = maxVelocity;
         // adjust speed according to the exhaustion
         if ((maxExhaust - currentExhaust) <= 10)
         {
-            temporaryMaxVelocity = maxVelocity * Random.Range(0.2f, 0.6f);
+            temporaryMaxVelocity = maxVelocity * Random.Range(0.3f, 0.6f);
         }
 
         Vector3 newVelocity = rigid.velocity;

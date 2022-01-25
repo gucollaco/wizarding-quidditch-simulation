@@ -31,9 +31,9 @@ public class SnitchController : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.CompareTag("WizardPart"))
+        if (other.gameObject.CompareTag("Wizard"))
         {
-            Team team = other.gameObject.GetComponentInParent<Team>();
+            Team team = other.gameObject.GetComponent<Team>();
             OnRoundEnd?.Invoke(team);
         }
     }
@@ -51,7 +51,7 @@ public class SnitchController : MonoBehaviour
         Vector3 newVelocity = rigid.velocity;
         newVelocity += acceleration * Time.deltaTime;
 
-        newVelocity = newVelocity.normalized * Mathf.Clamp(newVelocity.magnitude, 1, 2);
+        newVelocity = newVelocity.normalized * Mathf.Clamp(newVelocity.magnitude, 2.0f, 4.0f);
 
         rigid.velocity = newVelocity;
         transform.forward = rigid.velocity.normalized;
