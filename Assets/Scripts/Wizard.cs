@@ -172,10 +172,6 @@ public class Wizard : MonoBehaviour
         }
     }
 
-    private void OnCollisionEnter(Collision other)
-    {
-    }
-
     private void SnitchAttraction()
     {
         Vector3 acceleration = Vector3.zero;
@@ -193,24 +189,19 @@ public class Wizard : MonoBehaviour
         acceleration += snitchDifference.normalized;
         acceleration += NormalizeSteeringForce(snitchDifference) * 3;
 
-        // // add force to distance from neighbours
-        // Collider[] neighbours = Physics.OverlapSphere(thisPosition, 20);
-        // // deal with neighbours
-
         acceleration += NormalizeSteeringForce(ComputeSeperationForce());// * Flock.FlockSettings.SeperationForceWeight;
         acceleration += NormalizeSteeringForce(CollisionAvoidanceForce());
 
         float temporaryMaxVelocity = maxVelocity;
-        Debug.Log(maxExhaust - currentExhaust);
         // adjust speed according to the exhaustion
-        if ((maxExhaust - currentExhaust) <= 8)
+        if ((maxExhaust - currentExhaust) <= 10)
         {
             temporaryMaxVelocity = maxVelocity * Random.Range(0.2f, 0.6f);
         }
 
         Vector3 newVelocity = rigid.velocity;
         newVelocity += acceleration * Time.deltaTime;
-        newVelocity = newVelocity.normalized * Mathf.Clamp(newVelocity.magnitude, 3.0f, temporaryMaxVelocity);
+        newVelocity = newVelocity.normalized * Mathf.Clamp(newVelocity.magnitude, 0.0f, temporaryMaxVelocity);
 
         rigid.velocity = newVelocity;
         transform.forward = rigid.velocity.normalized + Vector3.right;
