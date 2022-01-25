@@ -13,11 +13,12 @@ public class Wizard : MonoBehaviour
     private float maxVelocity;
     private float aggressiveness;
     private float maxExhaust;
-    private float currentExhaust;
+    private float currentExhaust = 0.0f;
     private bool hasInitialized = false;
     private Vector3 lastVelocity;
     private float unconsciousTimeValue = 1f;
     private WaitForSeconds unconsciousTime;
+    private float exhaustTimer = 0.0f;
 
     private void Awake()
     {
@@ -28,7 +29,7 @@ public class Wizard : MonoBehaviour
             return;
 
         weight = BoxMuller.GaussianFloat(team.teamTraits.weightMean, team.teamTraits.weightStdDeviation);
-        maxVelocity = BoxMuller.GaussianFloat(team.teamTraits.maxExhaustionMean, team.teamTraits.maxVelocityStdDeviation);
+        maxVelocity = BoxMuller.GaussianFloat(team.teamTraits.maxVelocityMean, team.teamTraits.maxVelocityStdDeviation);
         aggressiveness = BoxMuller.GaussianFloat(team.teamTraits.aggressivenessMean, team.teamTraits.aggressivenessStdDeviation);
         maxExhaust = BoxMuller.GaussianFloat(team.teamTraits.maxExhaustionMean, team.teamTraits.maxExhaustionStdDeviation);
 
@@ -58,6 +59,7 @@ public class Wizard : MonoBehaviour
     private void Conscious()
     {
         SnitchAttraction();
+        HandleExhaustion();
     }
 
     private void Unconscious()
@@ -74,6 +76,23 @@ public class Wizard : MonoBehaviour
     private IEnumerator WaitUnconscious()
     {
         yield return unconsciousTime;
+    }
+
+    private void HandleExhaustion()
+    {
+        exhaustTimer += Time.deltaTime;
+        if (exhaustTimer > 3.0f)
+        {
+            currentExhaust = UpdateExhaustion(currentExhaust, rigid.velocity.magnitude, maxVelocity);
+
+            Mathf.Clamp(currentExhaust, 0.0f, maxExhaust);
+            if (currentExhaust >= maxExhaust)
+            {
+                ChangeState(true);
+            }
+
+            exhaustTimer = 0.0f;
+        }
     }
 
     private void OnTriggerEnter(Collider other)
@@ -181,9 +200,17 @@ public class Wizard : MonoBehaviour
         acceleration += NormalizeSteeringForce(ComputeSeperationForce());// * Flock.FlockSettings.SeperationForceWeight;
         acceleration += NormalizeSteeringForce(CollisionAvoidanceForce());
 
+        float temporaryMaxVelocity = maxVelocity;
+        Debug.Log(maxExhaust - currentExhaust);
+        // adjust speed according to the exhaustion
+        if ((maxExhaust - currentExhaust) <= 8)
+        {
+            temporaryMaxVelocity = maxVelocity * Random.Range(0.2f, 0.6f);
+        }
+
         Vector3 newVelocity = rigid.velocity;
         newVelocity += acceleration * Time.deltaTime;
-        newVelocity = newVelocity.normalized * Mathf.Clamp(newVelocity.magnitude, 3.0f, 6.0f);
+        newVelocity = newVelocity.normalized * Mathf.Clamp(newVelocity.magnitude, 3.0f, temporaryMaxVelocity);
 
         rigid.velocity = newVelocity;
         transform.forward = rigid.velocity.normalized + Vector3.right;
@@ -223,5 +250,17 @@ public class Wizard : MonoBehaviour
 
         // Compute force
         return transform.position - hitInfo.point;
+    }
+
+    private float UpdateExhaustion(float currentExhaust, float currentVelocity, float maxVelocity)
+    {
+        float velocityRatio = currentVelocity / maxVelocity;
+        float randomFloat = Random.Range(0.5f, 1.0f);
+
+        // if player is below half their max velocity, regain some energy
+        if (velocityRatio <= 0.5f)
+            return currentExhaust + (10 * (-velocityRatio)) * randomFloat;
+
+        return currentExhaust + (10 * velocityRatio) * randomFloat;
     }
 }
