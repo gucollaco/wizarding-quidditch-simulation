@@ -4,7 +4,7 @@ using System;
 public class BoxMuller : MonoBehaviour
 {
     // https://stackoverflow.com/questions/218060/random-gaussian-variables
-    private static System.Random random = new System.Random();
+    public static System.Random random = new System.Random();
 
     public static float GaussianFloat(float mean, float stdDeviation)
     {

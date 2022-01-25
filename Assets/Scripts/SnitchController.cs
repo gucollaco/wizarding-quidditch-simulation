@@ -21,7 +21,12 @@ public class SnitchController : MonoBehaviour
     private void OnCollisionEnter(Collision other)
     {
         if (other.gameObject.CompareTag("BoxSurface"))
-            rigid.velocity = -rigid.velocity;
+            rigid.AddForce(-rigid.velocity);
+        // else if (other.gameObject.CompareTag("Wizard"))
+        // {
+        //     Team team = other.gameObject.GetComponentInParent<Team>();
+        //     OnRoundEnd?.Invoke(team);
+        // }
     }
 
     private void OnTriggerEnter(Collider other)
@@ -77,7 +82,7 @@ public class SnitchController : MonoBehaviour
             Vector3 newVelocity = rigid.velocity;
             newVelocity += acceleration * Time.deltaTime;
 
-            newVelocity = newVelocity.normalized * Mathf.Clamp(newVelocity.magnitude, 6, 12);
+            newVelocity = newVelocity.normalized * Mathf.Clamp(newVelocity.magnitude, 5.0f, 10.0f);
 
             rigid.velocity = newVelocity;
             transform.forward = rigid.velocity.normalized;
