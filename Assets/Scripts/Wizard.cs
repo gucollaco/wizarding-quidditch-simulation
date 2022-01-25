@@ -39,6 +39,7 @@ public class Wizard : MonoBehaviour
     public void Initialize()
     {
         rigid.mass = weight;
+        rigid.AddForce(Vector3.forward);
         hasInitialized = true;
     }
 
