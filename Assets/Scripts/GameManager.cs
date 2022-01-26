@@ -55,9 +55,9 @@ public class GameManager : MonoBehaviour
 
     public void OnRoundEnd(Team team)
     {
-        snitch.SetActive(false);
         previousRoundWinner = roundWinner;
         roundWinner = team;
+        snitch.SetActive(false);
         roundFinished = true;
     }
 
@@ -200,9 +200,6 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator RoundEnding()
     {
-        previousRoundWinner = roundWinner;
-        roundWinner = GetRoundWinner();
-        
         roundWinner.teamTraits.points++;
 
         if (previousRoundWinner != null)
@@ -223,12 +220,6 @@ public class GameManager : MonoBehaviour
         RoundEndingText();
     
         yield return endWait;
-    }
-
-    private Team GetRoundWinner()
-    {
-        GameObject wizard = GameObject.FindGameObjectsWithTag("Wizard")[Random.Range(0, 20)];
-        return wizard.GetComponentInParent<Team>();
     }
 
     private bool CheckWinner()

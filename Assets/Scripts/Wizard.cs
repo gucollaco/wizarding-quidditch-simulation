@@ -5,8 +5,8 @@ using UnityEngine;
 public class Wizard : MonoBehaviour
 {
     public bool unconscious = false;
+    public Team team;
 
-    private Team team;
     private Rigidbody rigid;
     private GameObject snitch;
     private float weight;

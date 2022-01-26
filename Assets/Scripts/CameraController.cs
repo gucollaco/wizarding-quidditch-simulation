@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class CameraController : MonoBehaviour
 {
@@ -8,8 +9,11 @@ public class CameraController : MonoBehaviour
     private float rotateSpeed = 2f;
 
     private void LateUpdate () {
-        if (Input.GetAxisRaw("Horizontal") != 0 || Input.GetAxisRaw("Vertical") != 0) {
-            transform.position -= moveSpeed * new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"));
+        float horizontalAxis = Input.GetAxisRaw("Horizontal");
+        float verticalAxis = Input.GetAxisRaw("Vertical");
+
+        if (horizontalAxis != 0 || verticalAxis != 0) {
+            transform.position -= moveSpeed * new Vector3(horizontalAxis, 0, verticalAxis);
         }
         if (Input.GetKey(KeyCode.Q))
         {
@@ -21,7 +25,9 @@ public class CameraController : MonoBehaviour
         }
         if (Input.GetMouseButton(1))
         {
-            transform.eulerAngles += rotateSpeed * new Vector3(-Input.GetAxis("Mouse Y"), Input.GetAxis("Mouse X"), 0);
+            float mouseY = Input.GetAxis("Mouse Y");
+            float mouseX = Input.GetAxis("Mouse X");
+            transform.eulerAngles += rotateSpeed * new Vector3(-mouseY, mouseX, 0);
         }
     }
 }
