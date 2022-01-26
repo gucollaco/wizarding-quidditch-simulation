@@ -14,3 +14,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   targetPoints: 10
   wizardsQuantityPerTeam: 10
+  wizardFollowSnitchWeight: 2
+  wizardSeperationRadiusThreshold: 1
+  wizardSeperationForceWeight: 2
+  wizardCollisionAvoidanceRadiusThreshold: 20
+  wizardCollisionAvoidanceForceWeight: 1
+  wizardMaxSteerForce: 10
+  wizardUnconsciousTime: 1
+  wizardExhaustionTick: 3
+  snitchDirectionTimer: 3
+  snitchMaxSteerForce: 50
+  snitchMaxVelocity: 10
+  snitchMinVelocity: 5
+  snitchSpeed: 5
+  snitchRandomDirectionWeight: 1
+  snitchCollisionRadiusDetection: 10
+  snitchCollisionAvoidanceWeight: 2

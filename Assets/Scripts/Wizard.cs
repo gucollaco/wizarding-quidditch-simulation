@@ -16,7 +16,6 @@ public class Wizard : MonoBehaviour
     private float currentExhaust = 0.0f;
     private bool hasInitialized = false;
     private Vector3 lastVelocity;
-    private float unconsciousTimeValue = 1f;
     private WaitForSeconds unconsciousTime;
     private float exhaustTimer = 0.0f;
 
@@ -33,7 +32,7 @@ public class Wizard : MonoBehaviour
         aggressiveness = BoxMuller.GaussianFloat(team.teamTraits.aggressivenessMean, team.teamTraits.aggressivenessStdDeviation);
         maxExhaust = BoxMuller.GaussianFloat(team.teamTraits.maxExhaustionMean, team.teamTraits.maxExhaustionStdDeviation);
 
-        unconsciousTime = new WaitForSeconds(unconsciousTimeValue);
+        unconsciousTime = new WaitForSeconds(team.gameSettings.wizardUnconsciousTime);
     }
 
     public void Initialize()
@@ -81,7 +80,7 @@ public class Wizard : MonoBehaviour
     private void HandleExhaustion()
     {
         exhaustTimer += Time.deltaTime;
-        if (exhaustTimer > 3.0f)
+        if (exhaustTimer > team.gameSettings.wizardExhaustionTick)
         {
             currentExhaust = UpdateExhaustion(currentExhaust, rigid.velocity.magnitude, maxVelocity);
 
@@ -179,14 +178,13 @@ public class Wizard : MonoBehaviour
         // add force towards the snitch
         Vector3 snitchDifference = snitchPosition - thisPosition;
         acceleration += snitchDifference.normalized;
-        acceleration += NormalizeSteeringForce(snitchDifference) * 2;
-
-        acceleration += NormalizeSteeringForce(ComputeSeperationForce()) * 2;
-        acceleration += NormalizeSteeringForce(CollisionAvoidanceForce());
+        acceleration += NormalizeSteeringForce(snitchDifference) * team.gameSettings.wizardFollowSnitchWeight;
+        acceleration += NormalizeSteeringForce(ComputeSeperationForce()) * team.gameSettings.wizardSeperationForceWeight;
+        acceleration += NormalizeSteeringForce(CollisionAvoidanceForce()) * team.gameSettings.wizardCollisionAvoidanceForceWeight;
 
         float temporaryMaxVelocity = maxVelocity;
         // adjust speed according to the exhaustion
-        if ((maxExhaust - currentExhaust) <= 10)
+        if ((maxExhaust - currentExhaust) <= 20)
         {
             temporaryMaxVelocity = maxVelocity * Random.Range(0.3f, 0.6f);
         }
@@ -208,7 +206,7 @@ public class Wizard : MonoBehaviour
         // Find nearby wizards
         foreach (GameObject wizard in team.wizards)
         {
-            if (wizard == this.gameObject || (wizard.transform.position - transform.position).magnitude > 1)
+            if (wizard == this.gameObject || (wizard.transform.position - transform.position).magnitude > team.gameSettings.wizardSeperationRadiusThreshold)
                 continue;
 
             // Repel away
@@ -221,14 +219,14 @@ public class Wizard : MonoBehaviour
     // https://github.com/omaddam/Boids-Simulation
     private Vector3 NormalizeSteeringForce(Vector3 force)
     {
-        return force.normalized * Mathf.Clamp(force.magnitude, 0, 10);
+        return force.normalized * Mathf.Clamp(force.magnitude, 0, team.gameSettings.wizardMaxSteerForce);
     }
 
     // https://github.com/omaddam/Boids-Simulation
     private Vector3 CollisionAvoidanceForce()
     {
         // Check if heading to collision
-        if (!Physics.SphereCast(transform.position, 20, transform.forward, out RaycastHit hitInfo, 20))
+        if (!Physics.SphereCast(transform.position, team.gameSettings.wizardCollisionAvoidanceRadiusThreshold, transform.forward, out RaycastHit hitInfo, team.gameSettings.wizardCollisionAvoidanceRadiusThreshold))
             return Vector3.zero;
 
         // Compute force

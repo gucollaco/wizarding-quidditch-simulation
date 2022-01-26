@@ -6,11 +6,10 @@ using UnityEngine.Events;
 public class SnitchController : MonoBehaviour
 {
     public UnityEvent<Team> OnRoundEnd;
+    public GameSettings gameSettings;
 
     private Rigidbody rigid;
-    private float speed = 5.0f;
     private float timer = 0.0f;
-    private float directionChangeTime = 3.0f;
     private bool hasInitialized = false;
 
     private void Awake()
@@ -22,39 +21,19 @@ public class SnitchController : MonoBehaviour
     {
         if (other.gameObject.CompareTag("BoxSurface"))
             rigid.AddForce(-rigid.velocity);
-        // else if (other.gameObject.CompareTag("Wizard"))
-        // {
-        //     Team team = other.gameObject.GetComponentInParent<Team>();
-        //     OnRoundEnd?.Invoke(team);
-        // }
     }
 
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.CompareTag("Wizard"))
         {
-            Team team = other.gameObject.GetComponent<Team>();
+            Team team = other.gameObject.GetComponentInParent<Team>();
             OnRoundEnd?.Invoke(team);
         }
     }
 
     public void Initialize()
     {
-        Vector3 acceleration = Vector3.zero;
-        Vector3 randomSpherePoint = Random.onUnitSphere;
-        Vector3 randomDirection = (randomSpherePoint - transform.position) * speed;
-
-        acceleration += randomDirection;
-        acceleration += NormalizeSteeringForce(randomDirection);
-        acceleration += NormalizeSteeringForce(CollisionAvoidanceForce()) * 2;
-        
-        Vector3 newVelocity = rigid.velocity;
-        newVelocity += acceleration * Time.deltaTime;
-
-        newVelocity = newVelocity.normalized * Mathf.Clamp(newVelocity.magnitude, 2.0f, 4.0f);
-
-        rigid.velocity = newVelocity;
-        transform.forward = rigid.velocity.normalized;
         hasInitialized = true;
     }
 
@@ -66,23 +45,23 @@ public class SnitchController : MonoBehaviour
 
             timer += Time.deltaTime;
 
-            if (timer >= directionChangeTime)
+            if (timer >= gameSettings.snitchDirectionTimer)
             {
                 Vector3 randomSpherePoint = Random.onUnitSphere;
-                Vector3 randomDirection = (randomSpherePoint - transform.position) * speed;
+                Vector3 randomDirection = (randomSpherePoint - transform.position) * gameSettings.snitchSpeed;
 
                 acceleration += randomDirection;
-                acceleration += NormalizeSteeringForce(randomDirection);
+                acceleration += NormalizeSteeringForce(randomDirection) * gameSettings.snitchRandomDirectionWeight;
 
                 timer = 0.0f;
             }
 
-            acceleration += NormalizeSteeringForce(CollisionAvoidanceForce()) * 2;
+            acceleration += NormalizeSteeringForce(CollisionAvoidanceForce()) * gameSettings.snitchCollisionAvoidanceWeight;
 
             Vector3 newVelocity = rigid.velocity;
             newVelocity += acceleration * Time.deltaTime;
 
-            newVelocity = newVelocity.normalized * Mathf.Clamp(newVelocity.magnitude, 5.0f, 10.0f);
+            newVelocity = newVelocity.normalized * Mathf.Clamp(newVelocity.magnitude, gameSettings.snitchMinVelocity, gameSettings.snitchMaxVelocity);
 
             rigid.velocity = newVelocity;
             transform.forward = rigid.velocity.normalized;
@@ -92,14 +71,14 @@ public class SnitchController : MonoBehaviour
     // https://github.com/omaddam/Boids-Simulation
     private Vector3 NormalizeSteeringForce(Vector3 force)
     {
-        return force.normalized * Mathf.Clamp(force.magnitude, 0, 50);
+        return force.normalized * Mathf.Clamp(force.magnitude, 0, gameSettings.snitchMaxSteerForce);
     }
 
     // https://github.com/omaddam/Boids-Simulation
     private Vector3 CollisionAvoidanceForce()
     {
         // Check if heading to collision
-        if (!Physics.SphereCast(transform.position, 10, transform.forward, out RaycastHit hitInfo, 10))
+        if (!Physics.SphereCast(transform.position, gameSettings.snitchCollisionRadiusDetection, transform.forward, out RaycastHit hitInfo, gameSettings.snitchCollisionRadiusDetection))
             return Vector3.zero;
 
         // Compute force
