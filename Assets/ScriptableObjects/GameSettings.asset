@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f33e32814395cdc1c861f593853dc2b4, type: 3}
   m_Name: GameSettings
   m_EditorClassIdentifier: 
-  targetPoints: 10
+  targetPoints: 5
   wizardsQuantityPerTeam: 10
   wizardFollowSnitchWeight: 1
   wizardSeperationRadiusThreshold: 1
